@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Comma – Statisk demo</title>
+  <meta name="description" content="Én-fil demo av Comma kommunikasjonsassistent. Ingen installasjon. Offline.">
+  <style>
+    :root{
+      --ink:#111111;
+      --paper:#ffffff;
+      --mist:#F3F7FF;
+      --butter:#FFF7E6;
+      --blush:#FFE8F1;
+      --ocean:#2F6BFF;
+      --rose:#FF5A8A;
+      --forest:#1B7F5A;
+      --muted:#6B7280;
+
+      --radius-sm:12px;
+      --radius-md:18px;
+      --radius-lg:24px;
+      --radius-xl:32px;
+      --radius-pill:999px;
+
+      --shadow-soft:0 14px 34px rgba(17,24,39,.10);
+      --shadow-lift:0 20px 50px rgba(17,24,39,.14);
+
+      --max:1120px;
+      --border: 2px solid rgba(17,17,17,.14);
+      --font-head: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --font-body: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:var(--font-body);
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 900px at 20% 0%, var(--mist) 0%, #fff 55%),
+        radial-gradient(1100px 900px at 85% 30%, var(--butter) 0%, rgba(255,255,255,0) 55%);
+      line-height:1.55;
+    }
+    a{color:inherit}
+    .container{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+    .nav{
+      position:sticky;top:0;z-index:50;
+      background:rgba(255,255,255,.86);
+      backdrop-filter:saturate(160%) blur(12px);
+      border-bottom:1px solid rgba(17,17,17,.10);
+    }
+    .navInner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
+    .logo{display:flex;gap:10px;align-items:center;text-decoration:none}
+    .logo svg{width:36px;height:36px;flex:0 0 auto}
+    .logo strong{font-family:var(--font-head);letter-spacing:-.01em}
+    .navLinks{display:flex;gap:8px;flex-wrap:wrap;font-weight:900}
+    .navLinks a{padding:8px 10px;border-radius:var(--radius-pill);text-decoration:none}
+    .navLinks a:hover{background:var(--mist);border:var(--border)}
+    .navLinks a.active{background:var(--ink);color:#fff;border:2px solid var(--ink)}
+
+    .h1{font-family:var(--font-head);font-size:clamp(26px,4.2vw,48px);line-height:1.06;letter-spacing:-.02em;margin:0}
+    .h2{font-family:var(--font-head);font-size:clamp(18px,2.2vw,26px);line-height:1.12;letter-spacing:-.01em;margin:0}
+    .muted{color:var(--muted)}
+    .small{font-size:13px}
+
+    .card{
+      background:rgba(255,255,255,.82);
+      border:var(--border);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-soft);
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:var(--radius-pill);
+      border:var(--border);background:#fff;font-weight:900;
+    }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px 14px;border-radius:var(--radius-pill);
+      border:2px solid var(--ink);
+      background:rgba(255,255,255,.9);
+      font-weight:900;
+      box-shadow:var(--shadow-soft);
+      cursor:pointer;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn.primary{background:var(--ink);color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .grid{display:grid;gap:14px}
+    @media (min-width: 980px){.cols2{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:1.3fr .7fr}}
+    .sep{border:none;border-top:1px solid rgba(17,17,17,.14);margin:14px 0}
+
+    .input, select{
+      width:100%;
+      border:var(--border);
+      border-radius:18px;
+      background:#fff;
+      padding:12px 12px;
+    }
+    .textarea{
+      width:100%;
+      min-height:120px;
+      resize:vertical;
+      border:var(--border);
+      border-radius:18px;
+      background:#fff;
+      padding:12px 12px;
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .tag{
+      display:inline-flex;
+      padding:6px 10px;border-radius:var(--radius-pill);
+      border:2px solid rgba(17,17,17,.14);
+      background:rgba(255,255,255,.9);
+      font-weight:900;font-size:12px;
+    }
+
+    .chatWrap{display:flex;flex-direction:column;gap:10px}
+    .bubble{
+      max-width:92%;
+      padding:10px 12px;
+      border-radius:18px;
+      border:var(--border);
+      background:#fff;
+      box-shadow:var(--shadow-soft);
+      white-space:pre-wrap;
+    }
+    .bubble.me{margin-left:auto;background:var(--mist)}
+    .bubble.them{margin-right:auto;background:var(--butter)}
+    .toast{
+      position:fixed;
+      bottom:18px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#111;color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-weight:900;
+      box-shadow:var(--shadow-lift);
+      z-index:9999;
+    }
+    .view{display:none}
+    .view.active{display:block}
+  </style>
+</head>
+<body>
+<header class="nav">
+  <div class="container navInner">
+    <a class="logo" href="#home" aria-label="Comma home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 76" role="img" aria-label="Comma icon">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#F3F7FF"/>
+            <stop offset="1" stop-color="#FFF7E6"/>
+          </linearGradient>
+        </defs>
+        <rect x="6" y="6" width="64" height="64" rx="22" fill="url(#g)" stroke="#111" stroke-width="4.2"/>
+        <circle cx="29" cy="34" r="3.2" fill="#111"/>
+        <circle cx="47" cy="34" r="3.2" fill="#111"/>
+        <path d="M23 27c3-6 10-9 16-7" fill="none" stroke="#111" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M53 27c-3-6-10-9-16-7" fill="none" stroke="#111" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M25 49c7 7 19 7 26 0" fill="none" stroke="#111" stroke-width="4.2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <strong>Comma</strong>
+        <div class="muted small">Statisk demo (én fil)</div>
+      </div>
+    </a>
+    <nav class="navLinks" aria-label="Navigasjon">
+      <a id="navHome" href="#home">Hjem</a>
+      <a id="navHelper" href="#helper">Hjelper</a>
+      <a id="navAgreements" href="#agreements">Avtaler</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding:22px 0 42px">
+  <!-- HOME -->
+  <section id="viewHome" class="view active">
+    <div class="grid cols3">
+      <section class="card" style="padding:18px">
+        <div class="pill">Språk → avtaler → vedlikehold → fellesskap</div>
+        <h1 class="h1" style="margin-top:14px">Statisk demo (én HTML)</h1>
+        <p class="muted" style="margin:10px 0 16px">
+          Denne demoen har alt i én fil: HTML, CSS og JS. Ingen interne linker som kan knekke.
+          Forslagene er malbasert (demo), og “kommaregler” lagres lokalt i nettleseren.
+        </p>
+        <div class="row" style="margin:14px 0 10px">
+          <a class="btn primary" href="#helper">Åpne hjelper</a>
+          <a class="btn" href="#agreements">Se avtaler</a>
+        </div>
+        <hr class="sep"/>
+        <p class="small muted">
+          Når dere vil “ekte”: bytt ut <code>makeSuggestions()</code> med API-kall. Resten av UX-en står.
+        </p>
+      </section>
+
+      <aside class="card" style="padding:18px">
+        <h2 class="h2">Hva den beviser</h2>
+        <ol class="small" style="margin:10px 0 0; padding-left:18px">
+          <li>Input → forslag (simulert)</li>
+          <li>Avtaleobjekt (“kommaregel”)</li>
+          <li>Lagring og status (utkast/aktiv/arkiv)</li>
+        </ol>
+        <div class="row" style="margin-top:12px">
+          <span class="tag">Offline</span>
+          <span class="tag">Pitch-ready</span>
+          <span class="tag">Null installasjon</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- HELPER -->
+  <section id="viewHelper" class="view">
+    <div class="grid cols2">
+      <section class="card" style="padding:18px">
+        <div class="row" style="justify-content:space-between">
+          <h1 class="h2">Hjelperen</h1>
+          <span class="tag">Demo</span>
+        </div>
+        <p class="muted small" style="margin-top:8px">
+          Send én setning. Få 3 forslag. Lag en “kommaregel”. (Simulert uten API.)
+        </p>
+
+        <hr class="sep"/>
+
+        <div class="row" style="align-items:center">
+          <label class="small muted" for="mode">Modus</label>
+          <select id="mode" style="max-width:360px">
+            <option value="rewrite">Oversett til nøytralt språk</option>
+            <option value="clarify">Lag avklarende spørsmål</option>
+            <option value="agreement">Foreslå avtale / kommaregel</option>
+            <option value="repair">Foreslå reparasjon etter konflikt</option>
+          </select>
+          <span class="muted small">Tips: Ctrl+Enter sender.</span>
+        </div>
+
+        <div class="card" style="padding:12px;margin-top:12px">
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <strong>API-modus</strong>
+              <div class="muted small">Bruk ekte OpenAI via lokal proxy (anbefalt).</div>
+            </div>
+            <label class="row" style="gap:8px">
+              <input id="useApi" type="checkbox"/>
+              <span class="small">Bruk live AI</span>
+            </label>
+          </div>
+          <div class="small muted" style="margin-top:8px">
+            På GitHub Pages kan vi ikke bruke API-nøkkel i nettleseren.
+          </div>
+          <div class="row" style="margin-top:10px; align-items:center">
+            <label class="small muted" for="apiBase" style="min-width:120px">Backend URL</label>
+            <input id="apiBase" class="input" style="max-width:520px" placeholder="https://din-backend.example.com" />
+            <button class="btn" id="saveApiBase" type="button">Lagre</button>
+            <button class="btn" id="testApi" type="button">Test</button>
+          </div>
+          <div class="small muted" style="margin-top:8px">
+            Backend må tilby <code>POST /api/assist</code> og (valgfritt) <code>GET /api/ping</code>. Tips: du kan også åpne siden med <code>?backend=https://din-worker</code>.
+          </div>
+          <div class="small muted" style="margin-top:8px"> Legg inn en backend-endepunkt URL (f.eks. Cloudflare Worker/Netlify Function) hvis du vil ha live AI.
+          </div>
+        </div>
+
+        <div class="row" style="align-items:center;margin-top:12px">
+
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <div style="padding:14px">
+            <div class="row">
+              <span class="small muted">Hvem sin setning?</span>
+              <button class="btn primary" id="whoMe" type="button">Meg</button>
+              <button class="btn" id="whoThem" type="button">Partner</button>
+            </div>
+            <div style="margin-top:10px">
+              <textarea id="draft" class="textarea" placeholder="Skriv det du vil si (rått er lov)."></textarea>
+            </div>
+            <div class="row" style="margin-top:10px;justify-content:space-between">
+              <span class="small muted">Én setning om gangen er nok.</span>
+              <button class="btn primary" id="send" type="button">Foreslå</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div id="chat" class="chatWrap"></div>
+        </div>
+      </section>
+
+      <aside class="card" style="padding:18px">
+        <h2 class="h2">Forslag</h2>
+        <p id="summary" class="muted small" style="margin-top:8px"></p>
+        <hr class="sep"/>
+        <div id="suggestions"></div>
+        <hr class="sep"/>
+        <div class="small muted">
+          <strong>Merk:</strong> Demoen bruker maler. I “ekte” versjon bytter vi generatoren til OpenAI.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- AGREEMENTS -->
+  <section id="viewAgreements" class="view">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <h1 class="h2">Avtaler</h1>
+        <div class="muted small" style="margin-top:6px">
+          “Kommaregler” lagret lokalt i nettleseren (localStorage).
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="exportJson" type="button">Eksporter JSON</button>
+      </div>
+    </div>
+
+    <hr class="sep"/>
+
+    <div id="agreements"></div>
+
+    <hr class="sep"/>
+    <div class="small muted">
+      Tip: Vil du nullstille? Slett nettleserdata for filen/siden, eller åpne i inkognito.
+    </div>
+  </section>
+</main>
+
+<script>
+  // --------- Static Demo Logic (all-in-one) ----------
+  const KEY = "comma.agreements.v1";
+  const CHATKEY = "comma.chat.v1";
+
+
+  const APIBASEKEY = "comma.apiBase.v1";
+  function getApiBase(){
+    try{ return (localStorage.getItem(APIBASEKEY) || "").trim(); }catch{ return ""; }
+  }
+  function setApiBase(v){
+    try{ localStorage.setItem(APIBASEKEY, (v||"").trim()); }catch{}
+
+function normalizeBase(url){
+  return (url || "").trim().replace(/\/+$/,"");
+}
+
+function guessBackendUrl(){
+  // Priority:
+  // 1) ?backend=https://...
+  // 2) stored value
+  // 3) nothing (require user to set Worker URL)
+  try{
+    const u = new URL(location.href);
+    const q = u.searchParams.get("backend");
+    if(q) return normalizeBase(q);
+  }catch{}
+  return normalizeBase(getApiBase());
+}
+
+async function pingApi(base){
+  const b = normalizeBase(base);
+  if(!b) return { ok:false, error:"Mangler backend URL" };
+  try{
+    const r = await fetch(b + "/api/ping", { method:"GET" });
+    if(!r.ok) return { ok:false, error: "Ping feilet: " + r.status };
+    const j = await r.json().catch(()=> ({}));
+    return { ok:true, data:j };
+  }catch(e){
+    return { ok:false, error: String(e?.message || e) };
+  }
+}
+  }
+
+
+  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+  function load(key, fallback){
+    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch{ return fallback; }
+  }
+  function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function toast(msg){
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 1500);
+  }
+  function sanitize(s){ return (s||"").trim(); }
+
+  function templates(){
+    return {
+      rewrite: [
+        (t)=>`Når det går lenge uten svar, blir jeg urolig. Kan vi avtale et kort signal når du er opptatt?`,
+        (t)=>`Jeg merker at jeg blir stresset når jeg ikke får svar. Er du opptatt, kan du sende “ok” så jeg vet?`,
+        (t)=>`Når jeg ikke hører fra deg på en stund, begynner tankene å løpe. Kan vi finne en enkel løsning som funker for oss?`
+      ],
+      clarify: [
+        (t)=>`Hvor lenge er “lenge” for oss før det blir ubehagelig?`,
+        (t)=>`Hva er et realistisk “minimumssignal” når en av oss er opptatt?`,
+        (t)=>`Hva trenger vi i situasjonen: trygghet, info, eller en konkret avtale?`
+      ],
+      agreement: [
+        (t)=>`Vi sender et kort “ok/trenger tid” når vi ikke kan svare innen 30–60 min.`,
+        (t)=>`Hvis en av oss er utilgjengelig: send “opptatt, svarer senere” og ca. tidspunkt.`,
+        (t)=>`Hvis det blir stille lenge: vi sjekker inn med én nøytral melding før vi tolker.`
+      ],
+      repair: [
+        (t)=>`Jeg vil reparere: Jeg ble stressa og det kom ut skarpt. Kan vi prøve på nytt med roligere ord?`,
+        (t)=>`Beklager tonen. Jeg trengte trygghet, ikke å angripe. Kan vi avtale et “ok” når du er opptatt?`,
+        (t)=>`Jeg vil forstå, ikke vinne. Når passer det å ta dette på en rolig måte?`
+      ]
+    };
+  }
+
+  async function makeSuggestions(mode, who, text){
+  const useApi = !!document.querySelector("#useApi")?.checked;
+
+  // If API mode is on, call local proxy: POST /api/assist
+  if(useApi){
+    try{
+      const base = guessBackendUrl();
+          if(!base) throw new Error("Mangler backend URL (trykk Lagre).");
+          const r = await fetch(base.replace(/\/$/,"") + "/api/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, who, text })
+      });
+      if(!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      // normalize minimal shape
+      if(data && data.summary && Array.isArray(data.suggestions)) return data;
+      return { summary: "Svar mottatt, men formatet var uventet. Viser råtekst.", suggestions: [{title:"Svar", text: JSON.stringify(data)}], warnings: [] };
+    }catch(e){
+      return { summary: "API-feil. Faller tilbake til demo-maler.", suggestions: [], warnings: [String(e?.message || e)] };
+    }
+  }
+
+  // Demo fallback (malbasert)
+  const t = templates();
+  const pool = t[mode] || t.rewrite;
+  const base = pool.map(fn => fn(text));
+  const suggestions = base.slice(0,3).map((s, i)=>({
+    title: mode === "agreement" ? `Kommaregel ${i+1}` : `Forslag ${i+1}`,
+    text: s,
+    tone: mode === "rewrite" ? (i===0?"nøytral":i===1?"varm":"tydelig") :
+          mode === "repair" ? (i===0?"myk":i===1?"varm":"nøytral") :
+          (i===0?"kort":i===1?"nøytral":"tydelig"),
+    commarule: mode === "agreement" ? s : (i===0 ? `Send “ok” når du er opptatt.` : ""),
+    agreement: mode === "agreement" ? {
+      do: "Send kort signal ved utilgjengelighet",
+      when: "Når vi ikke kan svare innen 30–60 min",
+      exceptions: "Jobb/møte/krise",
+      repair: "Hvis det glipper: skriv ‘sorry, var utilgjengelig’ og gi ny tid",
+      check_in: "Ukentlig 5 min: funker regelen fortsatt?"
+    } : null
+  }));
+  const summaryByMode = {
+    rewrite: "Her er tre nøytrale varianter dere kan bruke som melding.",
+    clarify: "Her er tre avklaringsspørsmål som gjør det enklere å bli enige.",
+    agreement: "Her er tre forslag til ‘kommaregler’ (små avtaler) dere kan signere.",
+    repair: "Her er tre reparasjons-setninger som tar ned temperatur og åpner for dialog."
+  };
+  return { summary: summaryByMode[mode] || "Her er forslag.", suggestions, warnings: [] };
+}
+
+
+  function renderChat(chatEl, chat){
+    chatEl.innerHTML = "";
+    for(const m of chat){
+      const div = document.createElement("div");
+      div.className = "bubble " + (m.who === "me" ? "me" : m.who === "them" ? "them" : "assistant");
+      div.textContent = m.text;
+      chatEl.appendChild(div);
+    }
+  }
+
+  function renderSuggestions(host, data){
+    host.innerHTML = "";
+    if(!data){ host.innerHTML = `<div class="muted small">Ingen forslag ennå.</div>`; return; }
+
+    const wrap = document.createElement("div");
+    wrap.className = "grid";
+    for(const s of data.suggestions){
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.padding = "14px";
+      card.innerHTML = `
+        <div class="row" style="justify-content:space-between">
+          <strong>${s.title}</strong>
+          <span class="tag">${s.tone || "nøytral"}</span>
+        </div>
+        <p style="margin-top:10px;white-space:pre-wrap">${s.text}</p>
+        ${s.commarule ? `<div style="margin-top:10px"><span class="tag">Kommaregel</span><p class="small" style="margin-top:6px;white-space:pre-wrap">${s.commarule}</p></div>` : ""}
+        <div class="row" style="margin-top:10px">
+          <button class="btn" data-act="copy">Kopier</button>
+          <button class="btn" data-act="use">Bruk som melding</button>
+          <button class="btn primary" data-act="save">Lagre som avtale</button>
+        </div>
+      `;
+      card.querySelector('[data-act="copy"]').addEventListener("click", async ()=>{
+        try{ await navigator.clipboard.writeText(s.text); toast("Kopiert"); }
+        catch{ toast("Kopier feilet (OK)"); }
+      });
+      card.querySelector('[data-act="use"]').addEventListener("click", ()=>{
+        const chat = load(CHATKEY, []);
+        chat.push({ id: uid(), who: "assistant", text: s.text, ts: Date.now() });
+        save(CHATKEY, chat);
